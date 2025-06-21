@@ -1,0 +1,165 @@
+# --- I. Directory and File Path Configuration ---
+directory_paths:
+  # Base directories for storing various artifacts. These are relative to the BASE_PROJECT_PATH.
+  historical_data_dir: "data_historical"
+  models_artefacts_dir: "models"
+  tuning_results_dir: "results_tuning"
+  other_files_dir: "other_files"
+
+# --- II. Upstox API Configuration ---
+upstox:
+  access_token_file: "upstox_access_token.json"
+  access_token_hardcoded: null
+
+# --- III. Core Trading Parameters ---
+trading_parameters:
+  symbols:
+    - "IRFC"
+    - "IRB"
+
+  upstox_instrument_keys:
+    "IRFC": "NSE_EQ|INE053F01010"
+    "IRB": "NSE_EQ|INE821I01014"
+
+  target_interval: "1minute"
+  historical_data_lookback_days: 504 # Approx. 2 years of trading days to keep in the database.
+  
+
+# --- IV. Model & Signal Generation Parameters ---
+model_params:
+  lookback_window: 60
+  classification_price_change_threshold: 0.0020 # 0.20%
+  classification_lookahead_periods: 5
+
+# --- V. Technical Indicator Parameters ---
+indicator_params:
+  sma_periods: [10, 20, 50]
+  ema_periods: [12, 26, 50]
+  rsi_period: 14
+  macd_fast: 12
+  macd_slow: 26
+  macd_signal: 9
+  atr_period: 14
+  bb_window: 20
+  bb_num_std: 2.0
+  avg_daily_range_period: 10
+
+# --- VI. Advanced Pattern Detection Parameters ---
+pattern_params:
+  ob_lookback: 3
+  ob_thresh_mult: 1.0
+  ob_strict_refine: True
+  engulfing_inc_doji: True
+  ls_lookback: 5
+  ls_wick_ratio: 0.7
+  ls_body_close_thresh_ratio: 0.4
+  inst_lookback: 10
+  inst_vol_thresh: 1.5
+  inst_range_mult: 1.0
+  inst_wick_max_ratio: 0.25
+  mc_lookback: 10
+  mc_vol_thresh: 1.5
+  mc_range_thresh: 1.0
+  mc_trend_thresh_abs: 0.03
+  ms_lookback: 10
+  ms_vol_thresh: 1.2
+  ms_price_chg_thresh_pct: 0.0005
+
+# --- VII. Model Training Parameters ---
+training_params:
+  train_ratio: 0.8
+  test_ratio: 0.2
+  walk_forward_validation_enabled: True
+  n_splits_walk_forward: 3
+  epochs: 50
+  batch_size: 32
+  initial_learning_rate: 0.00005
+  weight_decay: 0.000001
+  l2_reg_strength: 0.000001
+  dropout_rate: 0.3
+  mixed_precision_enabled: True
+  xla_enabled: True
+
+  es_monitor: "val_sharpe_ratio"
+  es_patience: 12
+  es_restore_best: True
+  rlp_monitor: "val_sharpe_ratio" 
+  rlp_factor: 0.2
+  rlp_patience: 7
+  rlp_min_lr: 0.0000001
+  live_log_augmentation_sample_weight: 2.0
+  augmentation_loss_atr_multiplier: 0.5
+  max_augmentation_percentage: 0.05
+
+# --- VIII. Keras Tuner (Hyperparameter Optimization) ---
+tuner_params:
+  keras_tuner_enabled: True
+  tuner_project_name_base: "adaptive_trading_model_tuning"
+  model_base_name: "adaptive_trading_model"
+  tuner_objective_metric: "val_sharpe_ratio" # Optimizing for risk-adjusted return.
+  tuner_max_trials: 20
+  tuner_exec_per_trial: 1
+
+# --- IX. Trading Strategy & Risk Management ---
+strategy_params:
+  capital_allocation_mode: "EQUAL" # Can be "EQUAL" or "DYNAMIC_PNL"
+  mc_dropout_samples: 25
+  confidence_threshold_trade: 0.90
+  sl_atr_multiplier_default: 1.0
+  tp_atr_multiplier_default: 2.0
+  margin_utilization_percent: 0.92
+  upstox_intraday_leverage_multiplier: 5.0
+  capital_threshold_for_multi_trade: 30000.0
+  consecutive_loss_days_halt_threshold: 3
+  min_trades_for_strategy_adaptation_config: 10
+  strategy_adaptation_dampening_factor: 0.1
+  sl_atr_multiplier_min: 0.3  # Set the absolute minimum for the SL multiplier
+  sl_atr_multiplier_max: 1.0  # Set the absolute maximum for the SL multiplier
+  tp_atr_multiplier_min: 2.0  # Set the absolute minimum for the TP multiplier
+  tp_atr_multiplier_max: 4.0  # Set the absolute maximum for the TP multiplier
+
+# --- X. Backtesting & Simulation Parameters ---
+backtesting_params:
+  simulation_initial_capital: 50000
+  risk_free_rate: 0.07 # 7% annual risk-free rate for Sharpe Ratio.
+  backtest_transaction_cost_pct: 0.0007 # Realistic transaction cost.
+  slippage_pct: 0.0005 # Represents 0.05% slippage on trades
+
+# --- XI. Live Trading & Time-Based Rules ---
+live_trading_params:
+  auto_order_execution_enabled: False
+  default_order_quantity: 1
+  
+  # --- MODIFIED ---
+
+  live_monitoring_interval_seconds: 1 # How often to check SL/TP on live positions.
+  live_processing_interval_seconds: 5 # Not used by the current tick aggregation logic, but kept for future use.
+  live_aggregation_interval_seconds: 10 # Aggregate ticks into 10s micro-candles.
+  use_realtime_websocket_feed: True
+  max_daily_loss_fixed: 400.0
+  max_daily_loss_margin_threshold: 20000.0
+  max_daily_loss_margin_percentage: 0.030 # 3.0%
+  max_trades_per_day_global: 10
+  max_trades_per_symbol_per_day: 2
+  entry_order_type_default: "LIMIT"
+  entry_limit_price_buffer_pct: 0.0005
+  exit_order_type: "MARKET"
+  upstox_product_type: "I"
+  upstox_order_validity: "DAY"
+  max_order_retry_attempts: 3
+
+market_hours:
+  open_time: "09:15:00"
+  close_time: "15:30:00"
+  min_entry_time_after_open: "09:30:00"
+  no_new_entry_after_time: "14:00:00"
+  square_off_all_start_time: "14:45:00"
+  square_off_all_end_time: "14:55:00"
+
+# --- XII. Ensemble Modeling ---
+ensemble_params:
+  ensemble_enabled: False
+  n_ensemble_models: 3
+
+
+
