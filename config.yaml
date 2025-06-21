@@ -19,7 +19,7 @@ trading_parameters:
 
   upstox_instrument_keys:
     "IRFC": "NSE_EQ|INE053F01010"
-    "IRB": "NSE_EQ|INE821I01014"
+    "IRB": "NSE_EQ|INE821I01022"
 
   target_interval: "1minute"
   historical_data_lookback_days: 504 # Approx. 2 years of trading days to keep in the database.
@@ -96,7 +96,7 @@ tuner_params:
   keras_tuner_enabled: True
   tuner_project_name_base: "adaptive_trading_model_tuning"
   model_base_name: "adaptive_trading_model"
-  tuner_objective_metric: "val_sharpe_ratio" # Optimizing for risk-adjusted return.
+  tuner_objective_metric: "val_sharpe_ratio"
   tuner_max_trials: 20
   tuner_exec_per_trial: 1
 
@@ -133,7 +133,7 @@ live_trading_params:
   # --- MODIFIED ---
 
   live_monitoring_interval_seconds: 1 # How often to check SL/TP on live positions.
-  live_processing_interval_seconds: 5 # Not used by the current tick aggregation logic, but kept for future use.
+  live_processing_interval_seconds: 5 # How often to process signals from aggregated data.
   live_aggregation_interval_seconds: 10 # Aggregate ticks into 10s micro-candles.
   use_realtime_websocket_feed: True
   max_daily_loss_fixed: 400.0
