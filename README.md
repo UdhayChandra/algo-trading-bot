@@ -1,7 +1,6 @@
 # algo-trading-bot
 This algorithmic trading bot is a sophisticated system designed to automate trading decisions based on deep learning and technical analysis, operating in a real-time environment. It leverages an asynchronous, multi-threaded architecture to ensure responsiveness and fault tolerance.
 
-Here's a breakdown of how the bot works, including its ordering, entry, exit, Stop-Loss (SL), and Take-Profit (TP) conditions:
 
 ### How the Bot Works: The Overall Flow
 
